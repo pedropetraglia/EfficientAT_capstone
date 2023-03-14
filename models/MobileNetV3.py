@@ -67,6 +67,7 @@ pretrained_models = {
     "mn10_as_fc": urllib.parse.urljoin(model_url, "mn10_as_fc_mAP_465.pt"),
     "mn10_as_fc_s2221": urllib.parse.urljoin(model_url, "mn10_as_fc_s2221_mAP_466.pt"),
     "mn10_as_fc_s2211": urllib.parse.urljoin(model_url, "mn10_as_fc_s2211_mAP_466.pt"),
+    "mn10_98":'resources/mn10_esc50_epoch_49_mAP_98.pt',
 }
 
 
@@ -269,7 +270,7 @@ def _mobilenet_v3(
     model = MobileNetV3(inverted_residual_setting, last_channel, **kwargs)
 
     if pretrained_name in pretrained_models:
-        model_url = pretrained_models.get(pretrained_name)
+        model_url = 'resources/mn10_esc50_epoch_49_mAP_98.pt'
         state_dict = load_state_dict_from_url(model_url, model_dir=model_dir, map_location="cpu")
         if kwargs['head_type'] == "mlp":
             num_classes = state_dict['classifier.5.bias'].size(0)
