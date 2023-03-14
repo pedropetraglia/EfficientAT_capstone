@@ -271,6 +271,7 @@ def _mobilenet_v3(
 
     if pretrained_name in pretrained_models:
         model_url = 'resources/mn10_esc50_epoch_49_mAP_98.pt'
+        #model_url = pretrained_models.get(pretrained_name)
         state_dict = load_state_dict_from_url(model_url, model_dir=model_dir, map_location="cpu")
         if kwargs['head_type'] == "mlp":
             num_classes = state_dict['classifier.5.bias'].size(0)
