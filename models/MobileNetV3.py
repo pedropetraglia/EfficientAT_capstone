@@ -5,6 +5,7 @@ import torch.nn.functional as F
 from torchvision.ops.misc import ConvNormActivation
 from torch.hub import load_state_dict_from_url
 import urllib.parse
+import torch
 
 from models.utils import cnn_out_size
 from models.block_types import InvertedResidualConfig, InvertedResidual
@@ -16,10 +17,11 @@ from helpers.utils import NAME_TO_WIDTH
 # https://github.com/pytorch/vision/blob/main/torchvision/models/mobilenetv3.py
 
 # points to github releases
-model_url = "https://github.com/fschmid56/EfficientAT/releases/download/v0.0.1/"
+model_url = 'resources/mn10_esc50_epoch_49_mAP_98.pt'
 # folder to store downloaded models to
 model_dir = "resources"
 
+model_name = 'mn40_98'
 
 pretrained_models = {
     # pytorch ImageNet pre-trained model
@@ -67,6 +69,7 @@ pretrained_models = {
     "mn10_as_fc": urllib.parse.urljoin(model_url, "mn10_as_fc_mAP_465.pt"),
     "mn10_as_fc_s2221": urllib.parse.urljoin(model_url, "mn10_as_fc_s2221_mAP_466.pt"),
     "mn10_as_fc_s2211": urllib.parse.urljoin(model_url, "mn10_as_fc_s2211_mAP_466.pt"),
+    "mn40_98":'resources/mn10_esc50_epoch_49_mAP_98.pt',
 }
 
 
@@ -75,7 +78,7 @@ class MobileNetV3(nn.Module):
         self,
         inverted_residual_setting: List[InvertedResidualConfig],
         last_channel: int,
-        num_classes: int = 1000,
+        num_classes: int = 4,
         block: Optional[Callable[..., nn.Module]] = None,
         norm_layer: Optional[Callable[..., nn.Module]] = None,
         dropout: float = 0.2,
@@ -269,8 +272,9 @@ def _mobilenet_v3(
     model = MobileNetV3(inverted_residual_setting, last_channel, **kwargs)
 
     if pretrained_name in pretrained_models:
-        model_url = pretrained_models.get(pretrained_name)
-        state_dict = load_state_dict_from_url(model_url, model_dir=model_dir, map_location="cpu")
+        model_url = 'resources/mn10_esc50_epoch_49_mAP_98.pt'
+        #model_url = pretrained_models.get(pretrained_name)
+        state_dict = torch.load(model_url, map_location="cpu")
         if kwargs['head_type'] == "mlp":
             num_classes = state_dict['classifier.5.bias'].size(0)
         elif kwargs['head_type'] == "fully_convolutional":
@@ -307,7 +311,7 @@ def mobilenet_v3(pretrained_name: str = None, **kwargs: Any) \
     return _mobilenet_v3(inverted_residual_setting, last_channel, pretrained_name, **kwargs)
 
 
-def get_model(num_classes: int = 527, pretrained_name: str = None, width_mult: float = 1.0,
+def get_model(num_classes: int = 4, pretrained_name: str = None, width_mult: float = 1.0,
               reduced_tail: bool = False, dilated: bool = False, strides: Tuple[int, int, int, int] = (2, 2, 2, 2),
               head_type: str = "mlp", multihead_attention_heads: int = 4, input_dim_f: int = 128,
               input_dim_t: int = 1000, se_dims: str = 'c', se_agg: str = "max", se_r: int = 4):
