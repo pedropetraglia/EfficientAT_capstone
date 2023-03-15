@@ -2,3 +2,4 @@ __pycache__
 resources/*.pt
 resources/*.npy
 .idea
+mn10_esc50_epoch_49_mAP_97.pt
