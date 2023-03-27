@@ -56,6 +56,14 @@ def audio_tagging(args):
             preds[sorted_indexes[k]]))
     print("********************************************************")
 
+    # import required module
+    from playsound import playsound
+    import argparse
+
+    # for playing note.wav file
+    print('playing sound ' + audio_path)
+    playsound(audio_path)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Example of parser. ')
