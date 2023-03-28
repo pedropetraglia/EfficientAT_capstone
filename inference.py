@@ -26,7 +26,7 @@ def audio_tagging(args):
     if len(args.ensemble) > 0:
         model = get_ensemble_model(args.ensemble)
     else:
-        model = get_mobilenet(width_mult=4, pretrained_name=model_name, strides=args.strides,
+        model = get_mobilenet(width_mult=3, pretrained_name=model_name, strides=args.strides,
                               head_type=args.head_type)
     model.to(device)
     model.eval()
@@ -68,11 +68,11 @@ def audio_tagging(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Example of parser. ')
     # model name decides, which pre-trained model is loaded
-    parser.add_argument('--model_name', type=str, default='mn40_98')
+    parser.add_argument('--model_name', type=str, default='mn30_98')
     parser.add_argument('--strides', nargs=4, default=[2, 2, 2, 2], type=int)
     parser.add_argument('--head_type', type=str, default="mlp")
     parser.add_argument('--cuda', action='store_true', default=False)
-    parser.add_argument('--audio_path', type=str, required=True)
+    parser.add_argument('--audio_path', type=str, default='resources/siren-03-26.wav', required=False)
 
     # preprocessing
     parser.add_argument('--sample_rate', type=int, default=32000)

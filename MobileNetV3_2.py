@@ -17,11 +17,11 @@ from helpers.utils import NAME_TO_WIDTH
 # https://github.com/pytorch/vision/blob/main/torchvision/models/mobilenetv3.py
 
 # points to github releases
-model_url = 'resources/mn30_comb_epoch_22_mAP_87.pt'
+model_url = "https://github.com/fschmid56/EfficientAT/releases/download/v0.0.1/"
+
 # folder to store downloaded models to
 model_dir = "resources"
 
-model_name = 'mn30_98'
 
 pretrained_models = {
     # pytorch ImageNet pre-trained model
@@ -53,11 +53,15 @@ pretrained_models = {
     "mn10_as_mels_40": urllib.parse.urljoin(model_url, "mn10_as_mels_40_mAP_453.pt"),
     "mn10_as_mels_64": urllib.parse.urljoin(model_url, "mn10_as_mels_64_mAP_461.pt"),
     "mn10_as_mels_256": urllib.parse.urljoin(model_url, "mn10_as_mels_256_mAP_474.pt"),
-    "mn30_multi1": ("resources/mn30_multi_epoch_8_mAP_87.pt"),
-    "mn30_multi2": ("resources/mn30_multi_epoch_9_mAP_89.pt"),
-    "mn30_multi3": ("resources/mn30_multi_epoch_12_mAP_86_freq.pt"),
-    "mn40_multi1": ("resources/mn40_multi_epoch_12_mAP_87_freq.pt"),
-    "mn40_multi2": ("resources/mn40_multi_epoch_12_mAP_88.pt")
+    "mn30_urban": ("C:/Users/saisg/Desktop/study/WPy64-31090/EfficientAT-main/mn30_urban_epoch_23_mAP_95.pt"),
+    "mn30_fsd": ("mn30_fsd_epoch_21_mAP_96.pt"),
+    "mn30_esc": ("C:/Users/saisg/Desktop/study/WPy64-31090/EfficientAT-main/mn30_esc_epoch_48_mAP_64.pt"),
+    "mn30_single": ("mn30_single_epoch_20_mAP_99.pt"),
+    "mn30_multi1": ("mn30_multi_epoch_22_mAP_87.pt"),
+    "mn30_multi2": ("mn30_multi_epoch_8_mAP_87.pt"),
+    "mn30_multi3": ("mn30_multi_epoch_12_mAP_86_freq.pt"),
+    "mn40_multi1": ("mn40_multi_epoch_12_mAP_88.pt"),
+    "mn40_multi2": ("mn40_multi_epoch_12_mAP_87_freq.pt")
 }
 
 model_list=list(pretrained_models)
@@ -67,7 +71,7 @@ class MobileNetV3(nn.Module):
         self,
         inverted_residual_setting: List[InvertedResidualConfig],
         last_channel: int,
-        num_classes: int = 4,
+        num_classes: int = 1000,
         block: Optional[Callable[..., nn.Module]] = None,
         norm_layer: Optional[Callable[..., nn.Module]] = None,
         dropout: float = 0.2,
@@ -216,7 +220,7 @@ class MobileNetV3(nn.Module):
 
 
 def _mobilenet_v3_conf(
-        width_mult: float = NAME_TO_WIDTH(model_name),
+        width_mult: float = 1.0,
         reduced_tail: bool = False,
         dilated: bool = False,
         strides: Tuple[int] = (2, 2, 2, 2),
@@ -262,11 +266,12 @@ def _mobilenet_v3(
 
     if pretrained_name in pretrained_models:
         model_url = pretrained_models.get(pretrained_name)
-        # Self trained models are after 20th position
-        if model_list.index(pretrained_name) > 20:
-            state_dict = torch.load(model_url, map_location="cpu")
+        #Self trained models are after 20th position
+        if model_list.index(pretrained_name)>20:
+            state_dict=torch.load(model_url)
         else:
             state_dict = load_state_dict_from_url(model_url, model_dir=model_dir, map_location="cpu")
+            
         if kwargs['num_classes'] != state_dict['classifier.5.bias'].size(0):
             # if the number of logits is not matching the state dict,
             # drop the corresponding pre-trained part
@@ -296,7 +301,7 @@ def mobilenet_v3(pretrained_name: str = None, **kwargs: Any) \
     return _mobilenet_v3(inverted_residual_setting, last_channel, pretrained_name, **kwargs)
 
 
-def get_model(num_classes: int = 4, pretrained_name: str = None, width_mult: float = NAME_TO_WIDTH(model_name),
+def get_model(num_classes: int = 527, pretrained_name: str = None, width_mult: float = 1.0,
               reduced_tail: bool = False, dilated: bool = False, strides: Tuple[int, int, int, int] = (2, 2, 2, 2),
               head_type: str = "mlp", multihead_attention_heads: int = 4, input_dim_f: int = 128,
               input_dim_t: int = 1000, se_dims: str = 'c', se_agg: str = "max", se_r: int = 4):
