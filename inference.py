@@ -6,6 +6,7 @@ import numpy as np
 from torch import autocast
 from contextlib import nullcontext
 import os
+from pandas import *
 
 from models.MobileNetV3 import get_model as get_mobilenet, get_ensemble_model
 from models.preprocess import AugmentMelSTFT
@@ -92,6 +93,9 @@ if __name__ == '__main__':
     dir_list = sorted(os.listdir(path))
     num_dir = len(dir_list)
 
+    data = read_csv(r"C:/Users/Pedro/Documents/combined.csv")
+    outputs = data['target'].tolist()
+
     #for probability_threshold in np.arange(0.4, 0.8, 0.02):
     probability_threshold = 0.6
     for file in range(0, num_dir):
@@ -102,7 +106,6 @@ if __name__ == '__main__':
 
         print(targets)
 
-    outputs = [0,0,0,1,3]
     accuracy = metrics.accuracy_score(targets, outputs) #y_true, ypred
     print("targets: "+str(targets))
     print("outputs: "+str(outputs))
