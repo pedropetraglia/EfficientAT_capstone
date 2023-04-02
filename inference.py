@@ -89,24 +89,30 @@ if __name__ == '__main__':
 
     targets = []
 
-    path = r"C:/Users/Pedro/Documents/dataset/"
+    path = r"C:/Users/Pedro/Downloads/combined_dataset_and_csv/new/data/"
     dir_list = sorted(os.listdir(path))
     num_dir = len(dir_list)
 
-    data = read_csv(r"C:/Users/Pedro/Documents/combined.csv")
+    data = read_csv(r"C:/Users/Pedro/Downloads/combined_dataset_and_csv/new/combined_finetuning.csv")
     outputs = data['target'].tolist()
 
     accuracy = 0
 
-    for probability_threshold in np.arange(0.4, 0.8, 0.2):
-
+    #for probability_threshold in np.arange(0.94, 0.94, 0):
+    probability_threshold = 0.96
+    if accuracy == 0:
         for file in range(0, num_dir):
             actual_predicts = audio_tagging(args, pathh=path+dir_list[file])
             for i in range(0, 4):
-                if actual_predicts[i] > probability_threshold:
-                    targets = np.append(targets, i)
+                if actual_predicts[i] == max(actual_predicts):
+                    if max(actual_predicts) > probability_threshold:
+                        targets = np.append(targets, i)
+                    else:
+                        targets = np.append(targets, 4)
+                    break
 
-        temp_acc = metrics.accuracy_score(targets, outputs) #y_true, ypred
+
+        temp_acc = metrics.accuracy_score(targets, outputs)
         if temp_acc > accuracy:
             accuracy = temp_acc
             hold = probability_threshold
