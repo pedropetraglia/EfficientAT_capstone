@@ -8,6 +8,7 @@ from contextlib import nullcontext
 import os
 from pandas import *
 import csv
+import matplotlib.pyplot as plt
 
 from models.MobileNetV3 import get_model as get_mobilenet, get_ensemble_model
 from models.preprocess import AugmentMelSTFT
@@ -102,6 +103,9 @@ if __name__ == '__main__':
     holding = []
     holding2 = []
     outputs = []
+    hold = []
+    accuracy = []
+
     with open(r"C:/Users/Pedro/Downloads/combined_dataset_and_csv/new2/combined_finetuning.csv") as file_obj:
         heading = next(file_obj)
         reader_obj = csv.reader(file_obj)
@@ -110,12 +114,9 @@ if __name__ == '__main__':
                 holding = np.append(holding, int(row[i]))
             outputs.append(holding.tolist())
             holding = []
-    print (outputs)
-    accuracy = 0
+    print(outputs)
 
-    #for probability_threshold in np.arange(1.00, 0.94, -0.02):
-    probability_threshold = 0.8
-    if (accuracy == 0):
+    for probability_threshold in np.arange(1.00, 0.94, -0.02):
         for file in range(0, num_dir):
             actual_predicts = audio_tagging(args, pathh=path+dir_list[file])
             for i in range(0, 4):
@@ -130,13 +131,25 @@ if __name__ == '__main__':
 
 
         temp_acc = metrics.accuracy_score(targets, outputs)
-        if temp_acc > accuracy:
-            accuracy = temp_acc
-            hold = probability_threshold
+
+        accuracy = np.append(accuracy, temp_acc)
+        hold.append(probability_threshold.tolist())
+
         targets = []
 
     print(accuracy)
     print(hold)
+
+    plt.plot(hold, accuracy, label=f'HOLD BY ACCURACY')
+    #plt.plot(iterations, mn40_predict_time, label=f'mn40 prediction time, avg: {round(mn40_avg, 2)} s')
+
+    plt.xlabel('Prediction Threshold for <MODEL>')
+    plt.ylabel('Accuracy')
+    #plt.xticks(range(20))
+    plt.title('Accuracy vs Prediction Threshold for <MODEL>')
+    plt.legend(loc='best')
+    plt.savefig('prediction_threshold.png')
+    plt.show()
 
 
 
