@@ -7,6 +7,7 @@ from torch import autocast
 from contextlib import nullcontext
 import os
 from pandas import *
+import csv
 
 from models.MobileNetV3 import get_model as get_mobilenet, get_ensemble_model
 from models.preprocess import AugmentMelSTFT
@@ -65,7 +66,7 @@ def audio_tagging(args, pathh):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Example of parser. ')
     # model name decides, which pre-trained model is loaded
-    parser.add_argument('--model_name', type=str, default='mn30_multi1')
+    parser.add_argument('--model_name', type=str, default='mn40-98')
     parser.add_argument('--strides', nargs=4, default=[2, 2, 2, 2], type=int)
     parser.add_argument('--head_type', type=str, default="mlp")
     parser.add_argument('--cuda', action='store_true', default=False)
@@ -89,27 +90,43 @@ if __name__ == '__main__':
 
     targets = []
 
-    path = r"C:/Users/Pedro/Downloads/combined_dataset_and_csv/new/data/"
+    path = r"C:/Users/Pedro/Downloads/combined_dataset_and_csv/new2/data/"
     dir_list = sorted(os.listdir(path))
     num_dir = len(dir_list)
 
-    data = read_csv(r"C:/Users/Pedro/Downloads/combined_dataset_and_csv/new/combined_finetuning.csv")
-    outputs = data['target'].tolist()
+    data = read_csv(r"C:/Users/Pedro/Downloads/combined_dataset_and_csv/new2/combined_finetuning.csv")
+    outputs = np.append(data['car_horn'].tolist(), data['car_passing'].tolist())
+    outputs = np.append(outputs, data['engine'].tolist())
+    outputs = np.append(outputs, data['siren'].tolist())
 
+    holding = []
+    holding2 = []
+    outputs = []
+    with open(r"C:/Users/Pedro/Downloads/combined_dataset_and_csv/new2/combined_finetuning.csv") as file_obj:
+        heading = next(file_obj)
+        reader_obj = csv.reader(file_obj)
+        for row in reader_obj:
+            for i in range(0,4):
+                holding = np.append(holding, int(row[i]))
+            outputs.append(holding.tolist())
+            holding = []
+    print (outputs)
     accuracy = 0
 
-    #for probability_threshold in np.arange(0.94, 0.94, 0):
-    probability_threshold = 0.96
-    if accuracy == 0:
+    #for probability_threshold in np.arange(1.00, 0.94, -0.02):
+    probability_threshold = 0.8
+    if (accuracy == 0):
         for file in range(0, num_dir):
             actual_predicts = audio_tagging(args, pathh=path+dir_list[file])
             for i in range(0, 4):
-                if actual_predicts[i] == max(actual_predicts):
-                    if max(actual_predicts) > probability_threshold:
-                        targets = np.append(targets, i)
-                    else:
-                        targets = np.append(targets, 4)
-                    break
+                if actual_predicts[i] > probability_threshold:
+                    holding2 = np.append(holding2, int(1))
+                else:
+                    holding2 = np.append(holding2, int(0))
+            targets.append(holding2.tolist())
+            holding2 = []
+            print(targets)
+
 
 
         temp_acc = metrics.accuracy_score(targets, outputs)

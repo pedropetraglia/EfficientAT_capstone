@@ -57,7 +57,8 @@ pretrained_models = {
     "mn30_multi2": ("resources/mn30_multi_epoch_9_mAP_89.pt"),
     "mn30_multi3": ("resources/mn30_multi_epoch_12_mAP_86_freq.pt"),
     "mn40_multi1": ("resources/mn40_multi_epoch_12_mAP_87_freq.pt"),
-    "mn40_multi2": ("resources/mn40_multi_epoch_12_mAP_88.pt")
+    "mn40_multi2": ("resources/mn40_multi_epoch_12_mAP_88.pt"),
+    "mn40-98":("resources/mn40_esc50_epoch_49_mAP_98.pt")
 }
 
 model_list=list(pretrained_models)
