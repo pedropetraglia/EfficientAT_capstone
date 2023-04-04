@@ -67,7 +67,7 @@ def audio_tagging(args, pathh):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Example of parser. ')
     # model name decides, which pre-trained model is loaded
-    parser.add_argument('--model_name', type=str, default='mn40-98')
+    parser.add_argument('--model_name', type=str, default='mn30_multi2')
     parser.add_argument('--strides', nargs=4, default=[2, 2, 2, 2], type=int)
     parser.add_argument('--head_type', type=str, default="mlp")
     parser.add_argument('--cuda', action='store_true', default=False)
@@ -91,32 +91,29 @@ if __name__ == '__main__':
 
     targets = []
 
-    path = r"C:/Users/Pedro/Downloads/combined_dataset_and_csv/new2/data/"
+    path = r"C:/Users/Pedro/Downloads/combined_dataset_and_csv/new3/snippets/"
     dir_list = sorted(os.listdir(path))
     num_dir = len(dir_list)
-
-    data = read_csv(r"C:/Users/Pedro/Downloads/combined_dataset_and_csv/new2/combined_finetuning.csv")
-    outputs = np.append(data['car_horn'].tolist(), data['car_passing'].tolist())
-    outputs = np.append(outputs, data['engine'].tolist())
-    outputs = np.append(outputs, data['siren'].tolist())
 
     holding = []
     holding2 = []
     outputs = []
     hold = []
     accuracy = []
+    f1_sc = []
 
-    with open(r"C:/Users/Pedro/Downloads/combined_dataset_and_csv/new2/combined_finetuning.csv") as file_obj:
+    with open(r"C:/Users/Pedro/Downloads/combined_dataset_and_csv/new3/noisy_data.csv") as file_obj:
         heading = next(file_obj)
         reader_obj = csv.reader(file_obj)
         for row in reader_obj:
-            for i in range(0,4):
+            for i in range(0, 4):
                 holding = np.append(holding, int(row[i]))
             outputs.append(holding.tolist())
             holding = []
     print(outputs)
+    print(len(outputs))
 
-    for probability_threshold in np.arange(1.00, 0.94, -0.02):
+    for probability_threshold in np.arange(0.80, 0.40, -0.05):
         for file in range(0, num_dir):
             actual_predicts = audio_tagging(args, pathh=path+dir_list[file])
             for i in range(0, 4):
@@ -131,22 +128,25 @@ if __name__ == '__main__':
 
 
         temp_acc = metrics.accuracy_score(targets, outputs)
-
+        temp_f1 = metrics.f1_score(targets, outputs, average='micro')
         accuracy = np.append(accuracy, temp_acc)
+        f1_sc = np.append(f1_sc, temp_f1)
         hold.append(probability_threshold.tolist())
 
         targets = []
 
     print(accuracy)
+    print(f1_sc)
     print(hold)
 
-    plt.plot(hold, accuracy, label=f'HOLD BY ACCURACY')
+    plt.plot(hold, accuracy, 'r', label=f'Accuracy')
+    plt.plot(hold, f1_sc, 'b', label=f'F1 score')
     #plt.plot(iterations, mn40_predict_time, label=f'mn40 prediction time, avg: {round(mn40_avg, 2)} s')
 
-    plt.xlabel('Prediction Threshold for <MODEL>')
-    plt.ylabel('Accuracy')
+    plt.xlabel('Prediction Threshold for mn30 model')
+    plt.ylabel('Metrics')
     #plt.xticks(range(20))
-    plt.title('Accuracy vs Prediction Threshold for <MODEL>')
+    plt.title('Metrics vs Prediction Threshold for mn30 model')
     plt.legend(loc='best')
     plt.savefig('prediction_threshold.png')
     plt.show()
