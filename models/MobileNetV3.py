@@ -68,7 +68,7 @@ class MobileNetV3(nn.Module):
         self,
         inverted_residual_setting: List[InvertedResidualConfig],
         last_channel: int,
-        num_classes: int = 4,
+        num_classes: int = 3,
         block: Optional[Callable[..., nn.Module]] = None,
         norm_layer: Optional[Callable[..., nn.Module]] = None,
         dropout: float = 0.2,
@@ -297,7 +297,7 @@ def mobilenet_v3(pretrained_name: str = None, **kwargs: Any) \
     return _mobilenet_v3(inverted_residual_setting, last_channel, pretrained_name, **kwargs)
 
 
-def get_model(num_classes: int = 4, pretrained_name: str = None, width_mult: float = NAME_TO_WIDTH(model_name),
+def get_model(num_classes: int = 3, pretrained_name: str = None, width_mult: float = NAME_TO_WIDTH(model_name),
               reduced_tail: bool = False, dilated: bool = False, strides: Tuple[int, int, int, int] = (2, 2, 2, 2),
               head_type: str = "mlp", multihead_attention_heads: int = 4, input_dim_f: int = 128,
               input_dim_t: int = 1000, se_dims: str = 'c', se_agg: str = "max", se_r: int = 4):

@@ -56,7 +56,7 @@ def audio_tagging(args, pathh):
 
     # Print audio tagging top probabilities
     print("************* Acoustic Event Detected: *****************")
-    for k in range(4):
+    for k in range(3):
         print('{}: {}'.format(labels[k],
             preds[k]))
     print("********************************************************")
@@ -91,7 +91,7 @@ if __name__ == '__main__':
 
     targets = []
 
-    path = r"C:/Users/Pedro/Downloads/combined_dataset_and_csv/new3/snippets/"
+    path = r"C:/Users/Pedro/Downloads/combined_dataset_and_csv/3_classes_complete_sorted/datas/"
     dir_list = sorted(os.listdir(path))
     num_dir = len(dir_list)
 
@@ -102,11 +102,11 @@ if __name__ == '__main__':
     accuracy = []
     f1_sc = []
 
-    with open(r"C:/Users/Pedro/Downloads/combined_dataset_and_csv/new3/noisy_data.csv") as file_obj:
+    with open(r"C:/Users/Pedro/Downloads/combined_dataset_and_csv/3_classes_complete_sorted/datasc2.csv") as file_obj:
         heading = next(file_obj)
         reader_obj = csv.reader(file_obj)
         for row in reader_obj:
-            for i in range(0, 4):
+            for i in range(0, 3):
                 holding = np.append(holding, int(row[i]))
             outputs.append(holding.tolist())
             holding = []
@@ -116,7 +116,7 @@ if __name__ == '__main__':
     for probability_threshold in np.arange(0.80, 0.40, -0.05):
         for file in range(0, num_dir):
             actual_predicts = audio_tagging(args, pathh=path+dir_list[file])
-            for i in range(0, 4):
+            for i in range(0, 3):
                 if actual_predicts[i] > probability_threshold:
                     holding2 = np.append(holding2, int(1))
                 else:
